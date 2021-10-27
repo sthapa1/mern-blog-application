@@ -6,6 +6,8 @@ const cors = require('cors');
 
 // Module Imports
 const connectToDatabase = require('./config/db');
+const authRoutes = require('./routes/auth');
+const usersRoutes = require('./routes/users');
 
 // Express app
 const app = express();
@@ -18,6 +20,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(morgan(':method :url :status - :response-time ms'));
+
+// Routes
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', usersRoutes);
+
 
 app.listen(process.env.PORT, () => {
     console.log('Server is running at port: ' + process.env.PORT);
