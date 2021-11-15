@@ -2,47 +2,43 @@ import React from 'react';
 import { BrowserRouter, Route, Routes, Link} from 'react-router-dom';
 import Home from './components/Home';
 import Register from './components/Register';
-import {Provider} from 'react-redux';
-import store from './store';
 import Login from './components/Login';
 import Profile from './components/Profile';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
+import NavigationBar from './common/NavigationBar';
+import {Toaster} from 'react-hot-toast';
+import { useDispatch, useSelector } from 'react-redux';
+import { getLoggedInUser } from './store/slices/authSlice';
+import PrivateRoute from './common/PrivateRoute';
 
 function App() {
+  const {isAuthenticating} = useSelector(state=>state.auth); 
+  const dispatch = useDispatch();
+
+  const userId = localStorage.getItem('user_id');
+
+  React.useEffect(()=>{
+    if(userId){
+      dispatch(getLoggedInUser(userId));
+    }
+  }, [userId])
+
+  if(isAuthenticating){
+    return <h2>Loading please wait ...</h2>
+  }
+
   return (
-    <Provider store={store}>
+    <React.Fragment>
+      <Toaster />
       <BrowserRouter>
-        <Box sx={{ flexGrow: 1 }}>
-          <AppBar position="static">
-              <Toolbar>
-              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                  CIT Blog
-              </Typography>
-              <Link to='/login' >
-                  <Button color="inherit">Login</Button>
-              </Link>
-              <Link to='/register' >
-                  <Button color="inherit">Register</Button>
-              </Link>
-              <Link to='/profile' >
-                  <Button color="inherit">Profile</Button>
-              </Link>
-              <Button color="inherit">Logout</Button>
-              </Toolbar>
-          </AppBar>
-        </Box>
+        <NavigationBar />
         <Routes>
           <Route path="/register" element={<Register />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Home/>} />
         </Routes>
       </BrowserRouter>
-    </Provider>
+    </React.Fragment>
   );
 }
 

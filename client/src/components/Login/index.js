@@ -1,8 +1,13 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {TextField, Button, Alert} from '@mui/material';
-import {useDispatch} from 'react-redux'
+import {useDispatch, useSelector} from 'react-redux'
 import './style.css';
-import { loginUserAction } from '../../store/slices/authSlice';
+import { clearStatus, loginUserAction } from '../../store/slices/authSlice';
+import { Spinner } from 'react-bootstrap';
+import toast from 'react-hot-toast';
+import Status from '../../constants/status';
+import {useNavigate} from 'react-router-dom'
+
 export default function Login() {
 
     const [email, setEmail] = useState('');
@@ -10,6 +15,8 @@ export default function Login() {
     const [errors, setErrors] = useState([]);
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const {status, error, isLoggedIn} = useSelector(state=>state.auth)
 
     const reset = () => {
         setErrors([]);
@@ -35,18 +42,36 @@ export default function Login() {
                 password
             };
             dispatch(loginUserAction(payload));
-            reset();
-
         }
     }
+
+    useEffect(()=>{
+        if(status === Status.ERROR){
+            toast.error(error || 'Something went wrong.');
+        } else if(status===Status.SUCCESS){
+            toast.success('Logged in successfully.');
+            reset();
+            dispatch(clearStatus());
+            navigate('/');
+        }
+    }, [status])
+
+    useEffect(()=>{
+        if(isLoggedIn){
+            navigate('/');
+        }
+    }, [isLoggedIn])
+
     return (
         <div id="register">
             <div className='register-container'>
                 {errors.length > 0 && errors.map(err=><Alert severity="error">{err}</Alert>)}
                 <h3>Login</h3>
-                <TextField type="email" className="form-input" label="Email" onChange={(e)=>setEmail(e.target.value)} fullWidth variant="outlined" />
-                <TextField type="password" className="form-input" fullWidth label="Password" onChange={(e)=>setPassword(e.target.value)} variant="outlined" />
-                <Button type="submit" onClick= {handleSubmit} variant="contained" color="primary">Login</Button>
+                <TextField value={email} type="email" className="form-input" label="Email" onChange={(e)=>setEmail(e.target.value)} fullWidth variant="outlined" />
+                <TextField value={password} type="password" className="form-input" fullWidth label="Password" onChange={(e)=>setPassword(e.target.value)} variant="outlined" />
+                <Button type="submit" onClick= {handleSubmit} variant="contained" color="primary">{
+                    status===Status.PENDING ? <Spinner size='sm' animation='border' /> : 'Login'
+                }</Button>
             </div>
         </div>
     )
