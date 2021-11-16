@@ -41,7 +41,7 @@ class AuthController{
 
     async register(req, res){
         const {firstname, lastname, email, password} = req.body;
-
+        const photo = req.file.path;
         try {
             // Input Validation
             if(!(email && password)){
@@ -66,7 +66,8 @@ class AuthController{
                 firstname,
                 lastname,
                 email: email.toLowerCase(),
-                password: hashedPassword
+                password: hashedPassword,
+                photo
             })
 
             res.status(201).json(user);

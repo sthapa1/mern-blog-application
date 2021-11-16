@@ -5,7 +5,7 @@ import './style.css';
 import { registerUserAction, clearStatus } from '../../store/slices/authSlice';
 import {useNavigate} from 'react-router-dom'
 import Status from '../../constants/status';
-import { Spinner } from 'react-bootstrap';
+import { Spinner, Form } from 'react-bootstrap';
 import {toast} from 'react-hot-toast';
 export default function Register() {
     let navigate = useNavigate();
@@ -15,6 +15,7 @@ export default function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [photo, setPhoto] = useState('');
     const [errors, setErrors] = useState([]);
 
     const dispatch = useDispatch();
@@ -29,7 +30,8 @@ export default function Register() {
         setConfirmPassword('');
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = (e) => {
+        e.preventDefault();
         const error = []
         if(email === ''){
             error.push('Email is required');
@@ -42,12 +44,12 @@ export default function Register() {
             setErrors(error);
             return;
         }else {
-            const payload = {
-                firstname: firstName,
-                lastname: lastName,
-                email,
-                password
-            };
+            const payload = new FormData();
+            payload.append('email', email);
+            payload.append('firstname', firstName);
+            payload.append('lastname', lastName);
+            payload.append('password', password);
+            payload.append('photo', photo)
             dispatch(registerUserAction(payload));
         }
     }
@@ -73,15 +75,21 @@ export default function Register() {
         <div id="register">
             <div className='register-container'>
                 {errors.length > 0 && errors.map(err=><Alert severity="error">{err}</Alert>)}
-                <h3>Register</h3>
-                <TextField value={firstName} className="form-input" label="First Name" onChange={(e)=>setFirstName(e.target.value)} fullWidth variant="outlined" />
-                <TextField value={lastName} className="form-input" label="Last Name" onChange={(e)=>setLastName(e.target.value)} fullWidth variant="outlined" />
-                <TextField value={email} type="email" className="form-input" label="Email" onChange={(e)=>setEmail(e.target.value)} fullWidth variant="outlined" />
-                <TextField value={password} type="password" className="form-input" fullWidth label="Password" onChange={(e)=>setPassword(e.target.value)} variant="outlined" />
-                <TextField value={confirmPassword} type="password" className="form-input" fullWidth label="Confirm Password" onChange={(e)=>setConfirmPassword(e.target.value)} variant="outlined" />  
-                <Button type="submit" onClick= {handleSubmit} variant="contained" color="primary">{
-                    status===Status.PENDING ? <Spinner size='sm' animation='border' /> : 'Register'
-                }</Button>
+                <Form onSubmit={handleSubmit} encType='multipart/form-data'>
+                    <h3>Register</h3>
+                    <TextField value={firstName} className="form-input" label="First Name" onChange={(e)=>setFirstName(e.target.value)} fullWidth variant="outlined" />
+                    <TextField value={lastName} className="form-input" label="Last Name" onChange={(e)=>setLastName(e.target.value)} fullWidth variant="outlined" />
+                    <TextField value={email} type="email" className="form-input" label="Email" onChange={(e)=>setEmail(e.target.value)} fullWidth variant="outlined" />
+                    <TextField value={password} type="password" className="form-input" fullWidth label="Password" onChange={(e)=>setPassword(e.target.value)} variant="outlined" />
+                    <TextField value={confirmPassword} type="password" className="form-input" fullWidth label="Confirm Password" onChange={(e)=>setConfirmPassword(e.target.value)} variant="outlined" />  
+                    <Form.Group controlId="formFile" className="mb-3">
+                        <Form.Label>Upload Profile Picture</Form.Label>
+                        <Form.Control onChange={(e)=>setPhoto(e.target.files[0])} type="file" name='photo'/>
+                    </Form.Group>
+                    <Button type="submit" variant="contained" color="primary">{
+                        status===Status.PENDING ? <Spinner size='sm' animation='border' /> : 'Register'
+                    }</Button>
+                </Form>
             </div>
         </div>
     )
