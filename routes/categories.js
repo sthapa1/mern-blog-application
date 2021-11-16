@@ -1,1 +1,12 @@
-// routes for category
+const express = require('express');
+const CategoryController = require('../controllers/CategoryController');
+
+const router = express.Router();
+
+const categoryController = new CategoryController();
+
+router.get('/', categoryController.get);
+router.post('/', categoryController.create);
+router.delete('/:id', categoryController.delete);
+
+module.exports = router;

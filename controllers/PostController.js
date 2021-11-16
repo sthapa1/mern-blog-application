@@ -52,8 +52,3 @@ class PostController{
 }
 
 module.exports = PostController;
-
-try {
-} catch (error) {
-    res.status(500).json(error);
-}
