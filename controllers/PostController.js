@@ -52,3 +52,7 @@ class PostController{
 }
 
 module.exports = PostController;
+
+// Blog home page
+// Blog page
+// 

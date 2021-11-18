@@ -10,3 +10,6 @@ router.patch('/:id', userController.updateUserProfile);
 router.get('/:id', userController.getUserInfo);
 
 module.exports = router;
+
+// "/:id/posts"
+// "/:id/profile"
