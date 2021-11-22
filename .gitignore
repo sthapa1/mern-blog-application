@@ -9,6 +9,7 @@
 
 # testing
 /client/coverage
+/uploads
 
 # production
 /client/build

@@ -2,10 +2,19 @@ const Post = require("../models/Post");
 
 class PostController{
     async createPost(req, res){
+        const {title, content, category} = req.body;
         try {
-            const post = await Post.create(req.body);
+            const payload = {
+                title, 
+                content, 
+                category,
+                createdBy: req.user.user_id,
+                postImage: req.file.path
+            };
+            const post = await Post.create(payload);
             res.status(201).json(post);
         } catch (error) {
+            console.log(error)
             res.status(500).json(error);
         }
     }

@@ -1,5 +1,7 @@
 const express = require('express');
 const PostController = require('../controllers/PostController');
+const verifyToken = require('../middlewares/verifyToken');
+const uploadFile = require('../utils/uploadFile');
 
 const router = express.Router();
 
@@ -8,7 +10,7 @@ const postController = new PostController();
 router.get('/', postController.getAllPost);
 router.get('/:id', postController.viewPost);
 router.patch('/:id', postController.updatePost);
-router.post('/', postController.createPost);
+router.post('/', verifyToken, uploadFile.single('postImage'), postController.createPost);
 router.delete('/:id', postController.deletePost);
 
 // getTrendingPost()
